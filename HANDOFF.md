@@ -15,10 +15,10 @@ is remote `upstream`.
 - `src/scripts/smoke.ts`: live smoke test. Run with `npm run smoke`.
 - `.env.example`: shows which API keys exist.
 
-## Sources (10)
+## Sources (11)
 
-`met`, `artic`, `cleveland`, `rijksmuseum`, `vam`, `japansearch`, `wikidata`
-need no key. `harvard`, `smithsonian`, `tepapa` need a key in `.env`
+`met`, `artic`, `cleveland`, `rijksmuseum`, `nationalgallery`, `vam`,
+`japansearch`, `wikidata` need no key. `harvard`, `smithsonian`, `tepapa` need a key in `.env`
 (`HARVARD_API_KEY`, `SMITHSONIAN_API_KEY`, `TEPAPA_API_KEY`). A source with
 no key is skipped, not an error.
 
@@ -43,13 +43,57 @@ Not yet checked: Smithsonian links for units other than CHNDM (one per
 `record_link` host), and the `edanmdm-` fallback in the Cooper Hewitt fix,
 which assumes a record ID format that has not been confirmed.
 
-## Known issues
+### Cooper Hewitt link fix (2026-11-04)
 
-- Art Institute of Chicago images return 403 (bot challenge).
-- Smithsonian lookups by accession number (`chndm_1901-39-497`) return not
-  found; `edanmdm:chndm_1901-39-497` works. Results show the `ld1-...` ID.
-- `npm audit` reports vulnerabilities; not yet examined
-  (`npm audit --omit=dev` shows only those in shipped code).
+Cooper Hewitt (`CHNDM`) links from the Smithsonian source went to a generic page. `museumUrlOf()` in `src/providers/smithsonian.ts` now builds `https://www.si.edu/object/<slug>:<record_ID>` for those records (the slug is ignored; the record ID does the lookup). `record_ID` was added to `EdanRow`. Build is clean; `npm run smoke` shows only the Art Institute of Chicago 403.
+
+## ToDo
+
+- [x] Giani pair (`chndm_1901-39-497` and `-498`): `get_artwork` links carry the matching record IDs (2026-11-06). Not opened in a browser.
+- [ ] `search_artworks` returns the fixed link, not only `get_artwork`.
+- [ ] A title with accents or punctuation; an empty title (slug falls back to `object`).
+- [ ] One link per other Smithsonian host, to confirm they are unchanged (hosts listed in the provider note).
+- [ ] The fallback when `record_ID` is missing. It strips `edanmdm-` from `row.id`, but the ids seen are `ld1-...`.
+- [ ] The concurrent image-call problem: re-test on `main` to see whether it predates this change.
+
+**Git: check before committing**
+
+- Run `git branch` and `git status`: it isn't known which branch the edit was made on. Before this work `main` was one commit ahead of `origin/main`; the branches `add-new-apis` and `fix-cooper-hewitt-links` (suggested) exist or were proposed.
+- Keep the fix on its own branch from `upstream/main` so it can go upstream as a standalone PR.
+- `git diff` should show only `src/providers/smithsonian.ts`: no `dist` files, no keys.
+
+**Not investigated**
+
+- Smithsonian lookups by accession number (`chndm_1901-39-497`) return not found; `edanmdm:chndm_1901-39-497` works. Results show the `ld1-...` ID.
+- The Art Institute of Chicago 403.
+- `npm audit` reports 9 vulnerabilities (1 critical). `npm audit --omit=dev` shows only those in shipped code.
+- npm warns that `esbuild` and `fsevents` have unapproved install scripts. The build works regardless.
+
+**Next**
+
+1. Finish the checks above.
+2. Commit the fix on its own branch; consider a PR to upstream.
+3. Start on new sources, using the Status column in the dev-notes survey and the key checklist in `keys-in-keychain.md` (section 8).
+
+## Next source: National Gallery, London (designed, not built)
+
+Design agreed 2026-11-07. Work on `add-new-apis`, not `main`. Full API notes and sample responses are in the dev notes: `/Users/kimplowright/Development/_development-notes/art-mcp/providers/nationalgallery.md` (raw samples in `ng-london-raw/` beside it).
+
+- New file `src/providers/nationalgallery.ts`: source id `nationalgallery`, name "National Gallery, London", no key (`isAvailable()` returns true). Model it on `rijksmuseum.ts`.
+- Also touch: `SOURCES` in `src/types.ts`, `src/providers/index.ts`, the README source table, `src/scripts/smoke.ts` (add a sample query), and this file (Sources: 11). `.env.example` needs nothing.
+- **Search:** one POST to `https://data.ng.ac.uk/es/public/_search` (Elasticsearch 7.17 syntax; use `postJson`). A hit is a full record, so there is no second fetch. Filter `@datatype.base` = `object`. Free text: `multi_match` over `summary.title`, `title.value`, `creation.maker.summary.title`, `description.value`, `subject.summary.title`, `genre.summary.title`. Limit the payload with `_source.includes`; a full hit is about 76 KB.
+- **Get:** `https://data.ng.ac.uk/{PID}?profile=ciim-json` should return the same CIIM shape as a search hit, so one mapper serves both. IDs are PIDs such as `0F6J-0001-0000-0000`. Also accept an object number such as `NG35` by searching `identifier.value`.
+- **Link:** `https://data.ng.ac.uk/{PID}.html`, which redirects to the Gallery's own page when there is one.
+- **Rights:** images CC BY-NC-ND 4.0, descriptions CC BY 4.0, data CC0. Put that in `license`; leave `isPublicDomain` unset.
+- **Images:** IIIF at `https://data.ng.ac.uk/iiif/3/{image PID}/full/{width},/0/default.jpg`, with the image PID from `multimedia[0]["@admin"].uid`. Only when `access.media.public_image` is true. The Gallery's own docs disagree on whether IIIF works yet.
+
+**Check once built.** None of these could be tested from the sandbox.
+
+- [ ] POST to `_search` is accepted. The docs show GET with a body, which Node `fetch` can't send. If POST is refused, use the `_q`/`_source` URL parameters.
+- [ ] The IIIF image URL serves a JPEG. If not, return no image rather than a broken link.
+- [ ] `?profile=ciim-json` returns the same shape as a search hit.
+- [ ] Free-text results look relevant: "centaur" returned 5 objects with a plain `query_string`; the maker query for "Titian" returned 22.
+- [ ] `npm run smoke` passes for the new source.
 
 ## Running locally
 
