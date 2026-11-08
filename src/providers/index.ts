@@ -9,6 +9,7 @@ import { rijksmuseumProvider } from "./rijksmuseum.js";
 import { smithsonianProvider } from "./smithsonian.js";
 import { tepapaProvider } from "./tepapa.js";
 import { vamProvider } from "./vam.js";
+import { whitneyProvider } from "./whitney.js";
 import { wikidataProvider } from "./wikidata.js";
 
 /** All known providers, in default fan-out order. */
@@ -19,6 +20,7 @@ export const providers: Provider[] = [
   harvardProvider,
   rijksmuseumProvider,
   nationalGalleryProvider,
+  whitneyProvider,
   vamProvider,
   smithsonianProvider,
   japanSearchProvider,

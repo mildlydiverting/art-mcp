@@ -6,6 +6,7 @@ export const SOURCES = [
   "harvard",
   "rijksmuseum",
   "nationalgallery",
+  "whitney",
   "vam",
   "smithsonian",
   "japansearch",

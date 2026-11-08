@@ -5,7 +5,7 @@
 
 An [MCP](https://modelcontextprotocol.io) server for searching museum collections and viewing artwork images and metadata — right inside Claude (or any MCP client).
 
-It works out of the box with eight sources that need **no API key**, and can pull in three more if you provide free keys.
+It works out of the box with nine sources that need **no API key**, and can pull in three more if you provide free keys.
 
 ## Sources
 
@@ -16,6 +16,7 @@ It works out of the box with eight sources that need **no API key**, and can pul
 | Cleveland Museum of Art | `cleveland` | European & American | none |
 | Rijksmuseum | `rijksmuseum` | Dutch Golden Age | none |
 | National Gallery, London | `nationalgallery` | European painting | none |
+| Whitney Museum of American Art | `whitney` | American art, 20th–21st century | none |
 | Victoria and Albert Museum | `vam` | Chinese, Japanese, Korean, South & SE Asian, Islamic, African | none |
 | Japan Search | `japansearch` | Japanese art, prints, manuscripts | none |
 | Wikidata / Wikimedia Commons | `wikidata` | Latin America and anywhere without a museum API | none |
@@ -25,7 +26,7 @@ It works out of the box with eight sources that need **no API key**, and can pul
 
 ### Looking beyond Europe and the United States
 
-The first five sources are all Western institutions, which meant non-Western art was only
+The first six sources are all Western institutions, which meant non-Western art was only
 visible through a collecting museum's Asian or African department. The six added since
 address that directly, but the coverage is uneven in ways worth knowing up front:
 
@@ -140,7 +141,7 @@ Restart the client, then try: *"Search the Met for Van Gogh and show me an image
 
 ### Adding API keys
 
-All optional — eight sources work without any key. The server reads keys from the process
+All optional — nine sources work without any key. The server reads keys from the process
 environment, so pass them through your MCP client's `env` block; a bare `.env` file is
 **not** loaded automatically.
 
