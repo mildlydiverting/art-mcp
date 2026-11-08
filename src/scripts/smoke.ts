@@ -23,6 +23,7 @@ const QUERIES: Record<Source, string> = {
   nationalgallery: "Titian",
   whitney: "Hopper",
   smk: "Hammershøi",
+  risd: "Hokusai",
   vam: "Hokusai",
   smithsonian: "Bembe mask",
   // Japan Search catalogs in Japanese; an English query tests nothing useful.
@@ -44,6 +45,9 @@ const KNOWN_BROKEN: Partial<Record<Source, { step: Step; reason: string }>> = {
     reason: "images sit behind a Cloudflare bot challenge and 403 regardless of User-Agent",
   },
 };
+
+/** Sources that publish no image URLs by design, so there is no image step to run. */
+const METADATA_ONLY: ReadonlySet<Source> = new Set<Source>(["risd"]);
 
 type Step = "search" | "detail" | "image";
 type Status = "pass" | "fail" | "skip" | "known-broken";
@@ -176,7 +180,9 @@ async function checkProvider(provider: Provider): Promise<SourceResult> {
   // Not every record is illustrated, so take the first hit that offers a URL
   // rather than assuming the top result does.
   const withImage = results.find((a) => a.thumbnailUrl || a.imageUrl);
-  if (!withImage) {
+  if (METADATA_ONLY.has(source)) {
+    record("image", "skip", 0, "metadata-only source: no image URLs");
+  } else if (!withImage) {
     record("image", "fail", 0, `no result out of ${results.length} had an image URL`);
   } else {
     const url = (withImage.thumbnailUrl || withImage.imageUrl) as string;

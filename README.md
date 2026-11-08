@@ -18,6 +18,7 @@ It works out of the box with ten sources that need **no API key**, and can pull 
 | National Gallery, London | `nationalgallery` | European painting | none |
 | Whitney Museum of American Art | `whitney` | American art, 20th–21st century | none |
 | SMK, National Gallery of Denmark | `smk` | Danish and Nordic art, European painting | none |
+| RISD Museum | `risd` | Design, decorative arts, prints, Asian art. **Metadata only: no images** | none |
 | Victoria and Albert Museum | `vam` | Chinese, Japanese, Korean, South & SE Asian, Islamic, African | none |
 | Japan Search | `japansearch` | Japanese art, prints, manuscripts | none |
 | Wikidata / Wikimedia Commons | `wikidata` | Latin America and anywhere without a museum API | none |
