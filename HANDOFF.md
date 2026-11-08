@@ -82,9 +82,10 @@ Cooper Hewitt (`CHNDM`) links from the Smithsonian source went to a generic page
 
 ## Providers added (2026-11-07/08)
 
-Branch chain, each on top of the last, none pushed or sent upstream yet:
+Branch chain, each on top of the last, 
 `add-new-apis` (National Gallery, London) → `add-whitney` → `add-smk` →
-`add-europeana`. Dev notes for each are in
+`add-europeana` → `add-risd`. Pushed to the fork `origin` on 2026-11-08, not
+sent upstream. Dev notes for each are in
 `/Users/kimplowright/Development/_development-notes/art-mcp/`.
 
 - **National Gallery, London** (`nationalgallery`): Elasticsearch POST; IIIF
@@ -109,19 +110,23 @@ Kim's decisions.
   Art Institute of Chicago search (and images), Auckland Museum, Museums
   Victoria, Library of Congress. Not worked around. Auckland's API docs are in
   the dev notes `clippings/`.
-- **RISD Museum**: the search endpoint works, but real responses carry no image
-  URLs despite the docs listing `images`. Metadata-only; Kim is happy to add it
-  that way (not built).
+- **RISD Museum** (`risd`, built): the search endpoint works, but real responses
+  carry no image URLs despite the docs listing `images`. Metadata-only, and the
+  smoke test skips its image step.
 - **Getty Museum**: Linked Art, but no search endpoint; search needs SPARQL.
   Rijksmuseum is also Linked Art, so a shared reader is worth designing.
-- **UK Museum Data Service**: key is in Keychain (`MUSEUMDATASERVICE_API_KEY`);
-  not yet probed or built.
+- **UK Museum Data Service**: skipped for now. The token in Keychain
+  (`MUSEUMDATASERVICE_API_KEY`) is rejected by the Search API (401 invalid
+  token); it is probably the Extract token, not a Search API one (that comes
+  from the "Request a Search API key" form). Spec at
+  `https://api.museumdata.uk/api/spec`: `GET /api/v2/search` (`q`, `field`,
+  `filter`, `aggs`, `size`, `from`), `/api/v2/get?pid=`, Bearer auth.
 - Harvard image fetches occasionally time out at 30s; search and detail are fine.
 
 ## Next
 
 1. Commit this file; push the branch chain; PR the providers upstream if wanted.
-2. RISD (metadata only), then the Museum Data Service.
+2. Museum Data Service, once there is a working Search API token.
 3. Decide the facets plan (shape, date policy, when to start).
 
 ## Running locally
