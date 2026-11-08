@@ -24,6 +24,8 @@ It works out of the box with ten sources that need **no API key**, and can pull 
 | Harvard Art Museums | `harvard` | Encyclopaedic | free ([request one](https://docs.google.com/forms/d/1Fe1H4nOhFkrLpaeBpLAnSrIMYvcAxnYWm0IU9a6IkFA/viewform)) |
 | Smithsonian Open Access | `smithsonian` | African, Asian, Indigenous American | free ([sign up](https://api.data.gov/signup/)) |
 | Museum of New Zealand Te Papa Tongarewa | `tepapa` | Taonga Māori, Pacific Cultures | free ([register](https://data.tepapa.govt.nz/docs/register.html)) |
+| Europeana | `europeana` | European museums, libraries and archives: paintings, prints, drawings, photographs | free ([get one](https://pro.europeana.eu/pages/get-api)) |
+| Europeana, library and archive material | `europeana-archives` | Books, manuscripts, newspapers, audio, video, 3D. Searched only when named, never by `all` | same key as `europeana` |
 
 ### Looking beyond Europe and the United States
 
@@ -155,7 +157,8 @@ environment, so pass them through your MCP client's `env` block; a bare `.env` f
       "env": {
         "HARVARD_API_KEY": "your-key-here",
         "SMITHSONIAN_API_KEY": "your-key-here",
-        "TEPAPA_API_KEY": "your-key-here"
+        "TEPAPA_API_KEY": "your-key-here",
+        "EUROPEANA_API_KEY": "your-key-here"
       }
     }
   }

@@ -36,7 +36,7 @@ server.registerTool(
   {
     title: "List museum sources",
     description:
-      "List the museum data sources this server can query and whether each is currently available. Sources needing an API key are unavailable until the key is configured.",
+      "List the museum data sources this server can query and whether each is currently available. Sources needing an API key are unavailable until the key is configured. A source marked onlyWhenNamed is skipped by an 'all' search and must be named.",
     inputSchema: {},
   },
   async () => {
@@ -44,6 +44,7 @@ server.registerTool(
       source: p.id,
       name: p.name,
       available: p.isAvailable(),
+      ...(p.onlyWhenNamed ? { onlyWhenNamed: true } : {}),
     }));
     return textResult(list);
   },
@@ -59,12 +60,14 @@ server.registerTool(
       "IMPORTANT — this matches keywords against catalog metadata; it is not semantic search. Artist names, titles, cultures, and periods work well. Descriptions of subject matter work badly: a query like 'man crossing a bridge' matches any record containing 'man', 'bridge', or names like 'Bridges' and 'Cross', and buries the relevant results.\n\n" +
       "So translate the user's intent into catalog vocabulary before calling. If you can name a likely artist, school, or title from your own knowledge, search for that instead — e.g. prefer 'Hokusai' or 'Hiroshige Tokaido' over 'japanese painting of a bridge'. Searching a subject phrase directly is a last resort; if you must, use one or two distinctive nouns rather than a sentence.\n\n" +
       "Results are ordered by each museum's own relevance ranking, which is often weak — scan the whole list rather than assuming the first hit is best.\n\n" +
-      "CHOOSING A SOURCE. 'all' is a fine default, but naming a source is much better when the work has an obvious home. Eight of the thirteen sources hold mostly Western art (met, artic, cleveland, harvard, rijksmuseum, nationalgallery, whitney, smk); for anything else, reach for these first:\n" +
+      "CHOOSING A SOURCE. 'all' is a fine default, but naming a source is much better when the work has an obvious home. Eight of the fifteen sources hold mostly Western art (met, artic, cleveland, harvard, rijksmuseum, nationalgallery, whitney, smk); for anything else, reach for these first:\n" +
       "- Japanese art and objects → 'japansearch' (Japan's national aggregator), then 'vam', 'met'\n" +
       "- Chinese, Korean, South and Southeast Asian, Islamic → 'vam', then 'smithsonian'\n" +
       "- African art → 'smithsonian' with `unit_code:NMAfA` in the query, then 'vam'\n" +
       "- Indigenous Americas and pre-Columbian → 'smithsonian' with `unit_code:NMAI`\n" +
+      "- Library and archive material (books, manuscripts, newspapers, audio, video, 3D) → 'europeana-archives' only; an 'all' search never includes it\n" +
       "- Māori and Pacific → 'tepapa'\n" +
+      "- Smaller European museums, libraries and archives, and photographs (including portraits) → 'europeana' (an aggregator, so it also returns works held by museums that have their own source)\n" +
       "- Latin American art, and anywhere else with no museum API → 'wikidata'\n\n" +
       "Source-specific quirks worth knowing:\n" +
       "- 'smithsonian' accepts field filters in the query, so `unit_code:NMAfA` or `unit_code:FSG` (Asian art) narrows 21 museums to one. Write it as a plain AND term — 'Nasca AND unit_code:NMAI' — and do not parenthesise it, which makes the filter silently drop. Note that `unit_code:NMAI` returns metadata but essentially never images, so use it to find and read about Indigenous American works, not to display them.\n" +

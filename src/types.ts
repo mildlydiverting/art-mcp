@@ -12,6 +12,8 @@ export const SOURCES = [
   "smithsonian",
   "japansearch",
   "tepapa",
+  "europeana",
+  "europeana-archives",
   "wikidata",
 ] as const;
 
@@ -68,6 +70,11 @@ export interface ArtworkDetail extends Artwork {
 export interface Provider {
   readonly id: Source;
   readonly name: string;
+  /**
+   * True for sources that an `all` search skips and that are searched only when
+   * named, e.g. library and archive material that would swamp artwork results.
+   */
+  readonly onlyWhenNamed?: boolean;
   /** Whether the provider can currently be queried (e.g. required key present). */
   isAvailable(): boolean;
   search(query: string, limit: number): Promise<Artwork[]>;

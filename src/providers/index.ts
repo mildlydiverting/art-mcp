@@ -1,6 +1,7 @@
 import type { Provider, Source } from "../types.js";
 import { articProvider } from "./artic.js";
 import { clevelandProvider } from "./cleveland.js";
+import { europeanaArchivesProvider, europeanaProvider } from "./europeana.js";
 import { harvardProvider } from "./harvard.js";
 import { japanSearchProvider } from "./japansearch.js";
 import { metProvider } from "./met.js";
@@ -27,6 +28,8 @@ export const providers: Provider[] = [
   smithsonianProvider,
   japanSearchProvider,
   tepapaProvider,
+  europeanaProvider,
+  europeanaArchivesProvider,
   wikidataProvider,
 ];
 
@@ -36,7 +39,10 @@ export function getProvider(source: Source): Provider | undefined {
   return byId.get(source);
 }
 
-/** Providers that can currently be queried (required keys present). */
+/**
+ * Providers an `all` search covers: those that can currently be queried
+ * (required keys present), leaving out sources that are searched only when named.
+ */
 export function availableProviders(): Provider[] {
-  return providers.filter((p) => p.isAvailable());
+  return providers.filter((p) => p.isAvailable() && !p.onlyWhenNamed);
 }
