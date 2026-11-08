@@ -22,6 +22,7 @@ const QUERIES: Record<Source, string> = {
   rijksmuseum: "Rembrandt",
   nationalgallery: "Titian",
   whitney: "Hopper",
+  smk: "Hammershøi",
   vam: "Hokusai",
   smithsonian: "Bembe mask",
   // Japan Search catalogs in Japanese; an English query tests nothing useful.

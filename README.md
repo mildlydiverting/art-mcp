@@ -5,7 +5,7 @@
 
 An [MCP](https://modelcontextprotocol.io) server for searching museum collections and viewing artwork images and metadata — right inside Claude (or any MCP client).
 
-It works out of the box with nine sources that need **no API key**, and can pull in three more if you provide free keys.
+It works out of the box with ten sources that need **no API key**, and can pull in three more if you provide free keys.
 
 ## Sources
 
@@ -17,6 +17,7 @@ It works out of the box with nine sources that need **no API key**, and can pull
 | Rijksmuseum | `rijksmuseum` | Dutch Golden Age | none |
 | National Gallery, London | `nationalgallery` | European painting | none |
 | Whitney Museum of American Art | `whitney` | American art, 20th–21st century | none |
+| SMK, National Gallery of Denmark | `smk` | Danish and Nordic art, European painting | none |
 | Victoria and Albert Museum | `vam` | Chinese, Japanese, Korean, South & SE Asian, Islamic, African | none |
 | Japan Search | `japansearch` | Japanese art, prints, manuscripts | none |
 | Wikidata / Wikimedia Commons | `wikidata` | Latin America and anywhere without a museum API | none |
@@ -26,7 +27,7 @@ It works out of the box with nine sources that need **no API key**, and can pull
 
 ### Looking beyond Europe and the United States
 
-The first six sources are all Western institutions, which meant non-Western art was only
+The first seven sources are all Western institutions, which meant non-Western art was only
 visible through a collecting museum's Asian or African department. The six added since
 address that directly, but the coverage is uneven in ways worth knowing up front:
 
@@ -141,7 +142,7 @@ Restart the client, then try: *"Search the Met for Van Gogh and show me an image
 
 ### Adding API keys
 
-All optional — nine sources work without any key. The server reads keys from the process
+All optional — ten sources work without any key. The server reads keys from the process
 environment, so pass them through your MCP client's `env` block; a bare `.env` file is
 **not** loaded automatically.
 

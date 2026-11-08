@@ -7,6 +7,7 @@ import { metProvider } from "./met.js";
 import { nationalGalleryProvider } from "./nationalgallery.js";
 import { rijksmuseumProvider } from "./rijksmuseum.js";
 import { smithsonianProvider } from "./smithsonian.js";
+import { smkProvider } from "./smk.js";
 import { tepapaProvider } from "./tepapa.js";
 import { vamProvider } from "./vam.js";
 import { whitneyProvider } from "./whitney.js";
@@ -21,6 +22,7 @@ export const providers: Provider[] = [
   rijksmuseumProvider,
   nationalGalleryProvider,
   whitneyProvider,
+  smkProvider,
   vamProvider,
   smithsonianProvider,
   japanSearchProvider,
