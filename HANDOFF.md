@@ -70,7 +70,9 @@ Cooper Hewitt (`CHNDM`) links from the Smithsonian source went to a generic page
 **Not investigated**
 
 - Smithsonian lookups by accession number (`chndm_1901-39-497`) return not found; `edanmdm:chndm_1901-39-497` works. Results show the `ld1-...` ID.
-- The Art Institute of Chicago 403.
+- Art Institute of Chicago 403: fixed by sending its documented `AIC-User-Agent`
+  header (`src/lib/http.ts`, `fix/artic-user-agent`). Without it Cloudflare
+  challenges the API and the images.
 - `npm audit` reports 9 vulnerabilities (1 critical). `npm audit --omit=dev` shows only those in shipped code.
 - npm warns that `esbuild` and `fsevents` have unapproved install scripts. The build works regardless.
 
@@ -107,8 +109,9 @@ Kim's decisions.
 ## Known source problems
 
 - **Cloudflare bot challenges (403 with `cf-mitigated: challenge`)** block:
-  Art Institute of Chicago search (and images), Auckland Museum, Museums
-  Victoria, Library of Congress. Not worked around. Auckland's API docs are in
+  Auckland Museum, Museums Victoria, Library of Congress. Not worked around;
+  worth rereading each one's docs for a required identification header (the
+  Art Institute of Chicago turned out to need one). Auckland's API docs are in
   the dev notes `clippings/`.
 - **RISD Museum** (`risd`, built): the search endpoint works, but real responses
   carry no image URLs despite the docs listing `images`. Metadata-only, and the

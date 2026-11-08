@@ -39,12 +39,7 @@ const QUERIES: Record<Source, string> = {
  * fail the run — a nightly alert that is always red teaches everyone to ignore
  * it. They are still worth running: if one starts passing, we want to know.
  */
-const KNOWN_BROKEN: Partial<Record<Source, { step: Step; reason: string }>> = {
-  artic: {
-    step: "image",
-    reason: "images sit behind a Cloudflare bot challenge and 403 regardless of User-Agent",
-  },
-};
+const KNOWN_BROKEN: Partial<Record<Source, { step: Step; reason: string }>> = {};
 
 /** Sources that publish no image URLs by design, so there is no image step to run. */
 const METADATA_ONLY: ReadonlySet<Source> = new Set<Source>(["risd"]);
