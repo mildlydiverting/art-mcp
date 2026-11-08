@@ -1,6 +1,6 @@
 # Handover
 
-Last updated: 2026-11-04
+Last updated: 2026-11-08
 
 ## What this is
 
@@ -15,14 +15,19 @@ is remote `upstream`.
 - `src/scripts/smoke.ts`: live smoke test. Run with `npm run smoke`.
 - `.env.example`: shows which API keys exist.
 
-## Sources (11)
+## Sources (15)
 
-`met`, `artic`, `cleveland`, `rijksmuseum`, `nationalgallery`, `vam`,
-`japansearch`, `wikidata` need no key. `harvard`, `smithsonian`, `tepapa` need a key in `.env`
-(`HARVARD_API_KEY`, `SMITHSONIAN_API_KEY`, `TEPAPA_API_KEY`). A source with
-no key is skipped, not an error.
+Keyless: `met`, `artic`, `cleveland`, `rijksmuseum`, `nationalgallery`,
+`whitney`, `smk`, `vam`, `japansearch`, `wikidata`.
+Need a key in `.env`: `harvard` (`HARVARD_API_KEY`), `smithsonian`
+(`SMITHSONIAN_API_KEY`), `tepapa` (`TEPAPA_API_KEY`), `europeana` and
+`europeana-archives` (both `EUROPEANA_API_KEY`). A source with no key is
+skipped, not an error.
 
-## Recent changes (2026-11-04/05)
+`europeana-archives` (library and archive material) is **only searched when
+named**: `all` skips it. It uses the optional `Provider.onlyWhenNamed` flag.
+
+## Fixes (2026-11-04/05)
 
 All three are on `main` in the fork and sent upstream as separate PRs.
 
@@ -75,30 +80,54 @@ Cooper Hewitt (`CHNDM`) links from the Smithsonian source went to a generic page
 2. Commit the fix on its own branch; consider a PR to upstream.
 3. Start on new sources, using the Status column in the dev-notes survey and the key checklist in `keys-in-keychain.md` (section 8).
 
-## Next source: National Gallery, London (designed, not built)
+## Providers added (2026-11-07/08)
 
-Design agreed 2026-11-07. Work on `add-new-apis`, not `main`. Full API notes and sample responses are in the dev notes: `/Users/kimplowright/Development/_development-notes/art-mcp/providers/nationalgallery.md` (raw samples in `ng-london-raw/` beside it).
+Branch chain, each on top of the last, none pushed or sent upstream yet:
+`add-new-apis` (National Gallery, London) → `add-whitney` → `add-smk` →
+`add-europeana`. Dev notes for each are in
+`/Users/kimplowright/Development/_development-notes/art-mcp/`.
 
-- New file `src/providers/nationalgallery.ts`: source id `nationalgallery`, name "National Gallery, London", no key (`isAvailable()` returns true). Model it on `rijksmuseum.ts`.
-- Also touch: `SOURCES` in `src/types.ts`, `src/providers/index.ts`, the README source table, `src/scripts/smoke.ts` (add a sample query), and this file (Sources: 11). `.env.example` needs nothing.
-- **Search:** one POST to `https://data.ng.ac.uk/es/public/_search` (Elasticsearch 7.17 syntax; use `postJson`). A hit is a full record, so there is no second fetch. Filter `@datatype.base` = `object`. Free text: `multi_match` over `summary.title`, `title.value`, `creation.maker.summary.title`, `description.value`, `subject.summary.title`, `genre.summary.title`. Limit the payload with `_source.includes`; a full hit is about 76 KB.
-- **Get:** `https://data.ng.ac.uk/{PID}?profile=ciim-json` should return the same CIIM shape as a search hit, so one mapper serves both. IDs are PIDs such as `0F6J-0001-0000-0000`. Also accept an object number such as `NG35` by searching `identifier.value`.
-- **Link:** `https://data.ng.ac.uk/{PID}.html`, which redirects to the Gallery's own page when there is one.
-- **Rights:** images CC BY-NC-ND 4.0, descriptions CC BY 4.0, data CC0. Put that in `license`; leave `isPublicDomain` unset.
-- **Images:** IIIF at `https://data.ng.ac.uk/iiif/3/{image PID}/full/{width},/0/default.jpg`, with the image PID from `multimedia[0]["@admin"].uid`. Only when `access.media.public_image` is true. The Gallery's own docs disagree on whether IIIF works yet.
+- **National Gallery, London** (`nationalgallery`): Elasticsearch POST; IIIF
+  v3 images (`full/max`, `full/200,`; a fixed width above the original needs `^`).
+  Uses `creation.attribution` so "workshop of" is not credited to the master.
+- **Whitney** (`whitney`): Ransack filters, no free text, so each query word
+  becomes a per-field filter. Search is metadata plus images.
+- **SMK, National Gallery of Denmark** (`smk`): REST plus IIIF v2. Artist is
+  built from `production[]` to keep "copy after" and "follower of". Many
+  records (mostly prints and drawings) have no image.
+- **Europeana** (`europeana`, `europeana-archives`): aggregator, so results
+  overlap museums we search directly. Key sent in the `X-Api-Key` header. Many
+  records lack a maker. Thumbnail service gives 200px and 400px only.
 
-**Check once built.** None of these could be tested from the sandbox.
+Searches by one query string only. The shared filters and content types plan is
+in `plan-facets-and-content-types.md` (dev notes); nothing built, awaiting
+Kim's decisions.
 
-- [ ] POST to `_search` is accepted. The docs show GET with a body, which Node `fetch` can't send. If POST is refused, use the `_q`/`_source` URL parameters.
-- [ ] The IIIF image URL serves a JPEG. If not, return no image rather than a broken link.
-- [ ] `?profile=ciim-json` returns the same shape as a search hit.
-- [ ] Free-text results look relevant: "centaur" returned 5 objects with a plain `query_string`; the maker query for "Titian" returned 22.
-- [ ] `npm run smoke` passes for the new source.
+## Known source problems
+
+- **Cloudflare bot challenges (403 with `cf-mitigated: challenge`)** block:
+  Art Institute of Chicago search (and images), Auckland Museum, Museums
+  Victoria, Library of Congress. Not worked around. Auckland's API docs are in
+  the dev notes `clippings/`.
+- **RISD Museum**: the search endpoint works, but real responses carry no image
+  URLs despite the docs listing `images`. Metadata-only; Kim is happy to add it
+  that way (not built).
+- **Getty Museum**: Linked Art, but no search endpoint; search needs SPARQL.
+  Rijksmuseum is also Linked Art, so a shared reader is worth designing.
+- **UK Museum Data Service**: key is in Keychain (`MUSEUMDATASERVICE_API_KEY`);
+  not yet probed or built.
+- Harvard image fetches occasionally time out at 30s; search and detail are fine.
+
+## Next
+
+1. Commit this file; push the branch chain; PR the providers upstream if wanted.
+2. RISD (metadata only), then the Museum Data Service.
+3. Decide the facets plan (shape, date policy, when to start).
 
 ## Running locally
 
 - Keys live in the macOS Keychain. Run with them via
-  `~/bin/mcp-keychain.sh HARVARD_API_KEY SMITHSONIAN_API_KEY TEPAPA_API_KEY -- npm run smoke`
+  `~/bin/mcp-keychain.sh HARVARD_API_KEY SMITHSONIAN_API_KEY TEPAPA_API_KEY EUROPEANA_API_KEY -- npm run smoke`
 - Claude Desktop runs `dist/index.js`: `npm run build`, then Cmd+Q and reopen.
 - Never print API responses unfiltered; some include the key in `next` links.
 
