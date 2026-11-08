@@ -4,6 +4,7 @@ import { clevelandProvider } from "./cleveland.js";
 import { harvardProvider } from "./harvard.js";
 import { japanSearchProvider } from "./japansearch.js";
 import { metProvider } from "./met.js";
+import { nationalGalleryProvider } from "./nationalgallery.js";
 import { rijksmuseumProvider } from "./rijksmuseum.js";
 import { smithsonianProvider } from "./smithsonian.js";
 import { tepapaProvider } from "./tepapa.js";
@@ -17,6 +18,7 @@ export const providers: Provider[] = [
   clevelandProvider,
   harvardProvider,
   rijksmuseumProvider,
+  nationalGalleryProvider,
   vamProvider,
   smithsonianProvider,
   japanSearchProvider,
