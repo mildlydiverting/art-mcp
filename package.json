@@ -47,6 +47,7 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
+    "@thegetty/linkedart.js": "^0.21.4",
     "zod": "^3.24.0"
   },
   "devDependencies": {

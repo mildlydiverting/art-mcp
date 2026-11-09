@@ -1,3 +1,9 @@
+import {
+  getAccessionNumbers,
+  getValuesByClassification,
+  normalizeFieldToArray,
+  type LinkedArtNode,
+} from "@thegetty/linkedart.js";
 import { mapLimit } from "../lib/concurrency.js";
 import { FULL_WIDTH, THUMB_WIDTH, iiifAtWidth } from "../lib/iiif.js";
 import { getJson } from "../lib/http.js";
@@ -98,10 +104,21 @@ function preferEnglish(nodes: Ref[]): Ref | undefined {
 }
 
 function titleOf(o: LinkedArtObject): string {
-  const names = (o.identified_by ?? []).filter((n) => n.type === "Name");
-  const primary = names.filter((n) => isClassified(n, AAT.primaryTitle));
-  const chosen = preferEnglish(primary.length ? primary : names);
-  return chosen?.content || "Untitled";
+  // The library's own primary-name helpers return the text "Unknown (<id>)" when
+  // nothing matches, so use the lower-level lookup, which returns nothing.
+  const names = normalizeFieldToArray(
+    o as LinkedArtNode,
+    "identified_by",
+  ).filter((n) => n.type === "Name");
+  const byTitle = (language?: string) =>
+    getValuesByClassification(names, AAT.primaryTitle, { language })[0];
+  // English where there is one, then any primary title, then any name at all.
+  return (
+    byTitle("en") ||
+    byTitle() ||
+    preferEnglish(names as Ref[])?.content ||
+    "Untitled"
+  );
 }
 
 function artistOf(o: LinkedArtObject): string | undefined {
@@ -127,16 +144,16 @@ function dateOf(o: LinkedArtObject): string | undefined {
 }
 
 function objectNumberOf(o: LinkedArtObject): string | undefined {
-  const ids = (o.identified_by ?? []).filter(
-    (n) => n.type === "Identifier" && isClassified(n, AAT.objectNumber),
-  );
-  return ids[0]?.content || undefined;
+  return getAccessionNumbers(o as LinkedArtNode)[0] || undefined;
 }
 
 function museumUrlOf(o: LinkedArtObject): string | undefined {
   for (const s of o.subject_of ?? []) {
     for (const carrier of s.digitally_carried_by ?? []) {
-      if (carrier.format === "text/html" || isClassified(carrier, AAT.htmlPage)) {
+      if (
+        carrier.format === "text/html" ||
+        isClassified(carrier, AAT.htmlPage)
+      ) {
         const url = carrier.access_point?.[0]?.id;
         if (url) return url;
       }
@@ -273,7 +290,8 @@ export const rijksmuseumProvider: Provider = {
 
     if (!ids.length) {
       if (pages.every((p) => p.status === "rejected")) {
-        const reason = pages[0].status === "rejected" ? pages[0].reason : undefined;
+        const reason =
+          pages[0].status === "rejected" ? pages[0].reason : undefined;
         throw new Error(
           `Rijksmuseum search failed: ${
             reason instanceof Error ? reason.message : String(reason)
