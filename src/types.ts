@@ -9,6 +9,7 @@ export const SOURCES = [
   "whitney",
   "smk",
   "risd",
+  "getty",
   "vam",
   "smithsonian",
   "japansearch",

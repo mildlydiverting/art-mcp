@@ -19,6 +19,8 @@ declare module "@thegetty/linkedart.js" {
     classifications: string | string[],
     options?: HelperOptions,
   ): string[];
+  /** The content of the first entry in `referred_to_by` with this classification. */
+  export function getReferredToByClassification(resource: LinkedArtNode, classification: string): string | undefined;
   export function getPrimaryName(resource: LinkedArtNode, options?: HelperOptions): string | undefined;
   export function getPrimaryNames(resource: LinkedArtNode, options?: HelperOptions): string[];
   export function getAccessionNumbers(resource: LinkedArtNode, options?: HelperOptions): string[];

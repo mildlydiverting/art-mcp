@@ -2,6 +2,7 @@ import type { Provider, Source } from "../types.js";
 import { articProvider } from "./artic.js";
 import { clevelandProvider } from "./cleveland.js";
 import { europeanaArchivesProvider, europeanaProvider } from "./europeana.js";
+import { gettyProvider } from "./getty.js";
 import { harvardProvider } from "./harvard.js";
 import { japanSearchProvider } from "./japansearch.js";
 import { metProvider } from "./met.js";
@@ -25,6 +26,7 @@ export const providers: Provider[] = [
   nationalGalleryProvider,
   whitneyProvider,
   smkProvider,
+  gettyProvider,
   risdProvider,
   vamProvider,
   smithsonianProvider,

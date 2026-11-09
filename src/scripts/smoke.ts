@@ -24,6 +24,7 @@ const QUERIES: Record<Source, string> = {
   whitney: "Hopper",
   smk: "Hammershøi",
   risd: "Hokusai",
+  getty: "Irises",
   vam: "Hokusai",
   smithsonian: "Bembe mask",
   // Japan Search catalogs in Japanese; an English query tests nothing useful.
