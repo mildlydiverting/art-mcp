@@ -15,10 +15,10 @@ is remote `upstream`.
 - `src/scripts/smoke.ts`: live smoke test. Run with `npm run smoke`.
 - `.env.example`: shows which API keys exist.
 
-## Sources (15)
+## Sources (17)
 
 Keyless: `met`, `artic`, `cleveland`, `rijksmuseum`, `nationalgallery`,
-`whitney`, `smk`, `vam`, `japansearch`, `wikidata`.
+`whitney`, `smk`, `risd`, `getty`, `vam`, `japansearch`, `wikidata`.
 Need a key in `.env`: `harvard` (`HARVARD_API_KEY`), `smithsonian`
 (`SMITHSONIAN_API_KEY`), `tepapa` (`TEPAPA_API_KEY`), `europeana` and
 `europeana-archives` (both `EUROPEANA_API_KEY`). A source with no key is
@@ -86,8 +86,8 @@ Cooper Hewitt (`CHNDM`) links from the Smithsonian source went to a generic page
 
 Branch chain, each on top of the last, 
 `add-new-apis` (National Gallery, London) → `add-whitney` → `add-smk` →
-`add-europeana` → `add-risd`. Pushed to the fork `origin` on 2026-11-08, not
-sent upstream. Dev notes for each are in
+`add-europeana` → `add-risd`, then `use-linkedart-js` → `add-getty` (cut from
+`add-risd`). All pushed to the fork `origin`, none sent upstream. Dev notes for each are in
 `/Users/kimplowright/Development/_development-notes/art-mcp/`.
 
 - **National Gallery, London** (`nationalgallery`): Elasticsearch POST; IIIF
@@ -113,11 +113,21 @@ Kim's decisions.
   worth rereading each one's docs for a required identification header (the
   Art Institute of Chicago turned out to need one). Auckland's API docs are in
   the dev notes `clippings/`.
+- **Cloudflare, tested again 2026-11-09:** Auckland and the Library of Congress
+  are still challenged from Kim's phone hotspot, so it is not her home network.
 - **RISD Museum** (`risd`, built): the search endpoint works, but real responses
   carry no image URLs despite the docs listing `images`. Metadata-only, and the
   smoke test skips its image step.
-- **Getty Museum**: Linked Art, but no search endpoint; search needs SPARQL.
-  Rijksmuseum is also Linked Art, so a shared reader is worth designing.
+- **Getty Museum** (`getty`, built): the API cannot list or search, so search is
+  SPARQL (title and maker, then one summary query, 3-4s). Matching makers across
+  all works in one query takes 25s+, so find the person first. A full record is
+  about 440KB and is fetched only for detail. Words must all match in a title or
+  in a maker name, so "van gogh irises" finds nothing.
+- **Linked Art:** `@thegetty/linkedart.js` is a dependency (no bundled types, so
+  `src/linkedart.d.ts` declares the helpers used). Rijksmuseum uses it for titles
+  and accession numbers, checked identical to a saved baseline. Beware: its
+  `getPrimaryName`/`getPrimaryNames` return the text "Unknown (<id>)" when nothing
+  matches; use `getValuesByClassification` where a miss must be empty.
 - **UK Museum Data Service**: skipped for now. The token in Keychain
   (`MUSEUMDATASERVICE_API_KEY`) is rejected by the Search API (401 invalid
   token); it is probably the Extract token, not a Search API one (that comes
@@ -128,7 +138,8 @@ Kim's decisions.
 
 ## Next
 
-1. Commit this file; push the branch chain; PR the providers upstream if wanted.
+1. PR the providers upstream if wanted (upstream has not acted on PRs #2-#4;
+   the Art Institute fix is its own PR from `fix/artic-user-agent`).
 2. Museum Data Service, once there is a working Search API token.
 3. Decide the facets plan (shape, date policy, when to start).
 
