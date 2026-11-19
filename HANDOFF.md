@@ -15,13 +15,14 @@ is remote `upstream`.
 - `src/scripts/smoke.ts`: live smoke test. Run with `npm run smoke`.
 - `.env.example`: shows which API keys exist.
 
-## Sources (17)
+## Sources (18)
 
 Keyless: `met`, `artic`, `cleveland`, `rijksmuseum`, `nationalgallery`,
 `whitney`, `smk`, `risd`, `getty`, `vam`, `japansearch`, `wikidata`.
 Need a key in `.env`: `harvard` (`HARVARD_API_KEY`), `smithsonian`
 (`SMITHSONIAN_API_KEY`), `tepapa` (`TEPAPA_API_KEY`), `europeana` and
-`europeana-archives` (both `EUROPEANA_API_KEY`). A source with no key is
+`europeana-archives` (both `EUROPEANA_API_KEY`), `parismusees`
+(`PARISMUSEES_API_KEY`). A source with no key is
 skipped, not an error.
 
 `europeana-archives` (library and archive material) is **only searched when
@@ -106,6 +107,28 @@ Searches by one query string only. The shared filters and content types plan is
 in `plan-facets-and-content-types.md` (dev notes); nothing built, awaiting
 Kim's decisions.
 
+## Paris Musées (2026-11-19)
+
+Branch `add-parismusees`, cut from `main`. `parismusees`, key
+`PARISMUSEES_API_KEY` (Keychain), sent in an `auth-token` header.
+
+- GraphQL on Drupal (`https://apicollections.parismusees.paris.fr/graphql`).
+  Search is `searchAPISearch` on index `collections`, filtered with
+  `type_contenu_chaine_s = oeuvre`; detail is `nodeById` with the `fieldCartel*`
+  label strings. One request each: the public quota is 1,000 a day.
+- Rights per image: `fieldImageLibre` true (`fieldImageDroits` "CC0 Paris
+  Musées / …") or null. Only free images get `imageUrl` and a licence.
+- `fieldMediaImage` is null on the public API, so no derivatives: `imageUrl`
+  is the ~3MB original from the public website.
+- Boolean conditions in `searchAPISearch` ignore `false`; filter in code.
+- Probe scripts, schema introspection and sample responses are in the dev
+  notes, `art-mcp-notes/clippings/parismusees/`.
+- The index can return one artwork several times ("Lavacourt" gave 226737
+  three times), so search fetches 3x the limit and de-duplicates.
+- Checked live 2026-11-19: search, detail, image (3MB, 6s). Query variables
+  work. Whether `conjunction: "AND"` narrows multi-word searches is not
+  confirmed: "soleil couchant" gave the same top 5 as the probe without it.
+
 ## Known source problems
 
 - **Cloudflare bot challenges (403 with `cf-mitigated: challenge`)** block:
@@ -146,7 +169,7 @@ Kim's decisions.
 ## Running locally
 
 - Keys live in the macOS Keychain. Run with them via
-  `~/bin/mcp-keychain.sh HARVARD_API_KEY SMITHSONIAN_API_KEY TEPAPA_API_KEY EUROPEANA_API_KEY -- npm run smoke`
+  `~/bin/mcp-keychain.sh HARVARD_API_KEY SMITHSONIAN_API_KEY TEPAPA_API_KEY EUROPEANA_API_KEY PARISMUSEES_API_KEY -- npm run smoke`
 - Claude Desktop runs `dist/index.js`: `npm run build`, then Cmd+Q and reopen.
 - Never print API responses unfiltered; some include the key in `next` links.
 

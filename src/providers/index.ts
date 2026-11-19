@@ -7,6 +7,7 @@ import { harvardProvider } from "./harvard.js";
 import { japanSearchProvider } from "./japansearch.js";
 import { metProvider } from "./met.js";
 import { nationalGalleryProvider } from "./nationalgallery.js";
+import { parisMuseesProvider } from "./parismusees.js";
 import { rijksmuseumProvider } from "./rijksmuseum.js";
 import { risdProvider } from "./risd.js";
 import { smithsonianProvider } from "./smithsonian.js";
@@ -34,6 +35,7 @@ export const providers: Provider[] = [
   tepapaProvider,
   europeanaProvider,
   europeanaArchivesProvider,
+  parisMuseesProvider,
   wikidataProvider,
 ];
 

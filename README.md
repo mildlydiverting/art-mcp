@@ -28,6 +28,7 @@ It works out of the box with ten sources that need **no API key**, and can pull 
 | Museum of New Zealand Te Papa Tongarewa | `tepapa` | Taonga Māori, Pacific Cultures | free ([register](https://data.tepapa.govt.nz/docs/register.html)) |
 | Europeana | `europeana` | European museums, libraries and archives: paintings, prints, drawings, photographs | free ([get one](https://pro.europeana.eu/pages/get-api)) |
 | Europeana, library and archive material | `europeana-archives` | Books, manuscripts, newspapers, audio, video, 3D. Searched only when named, never by `all` | same key as `europeana` |
+| Paris Musées (14 City of Paris museums) | `parismusees` | Paris history, 19th-century French art, fashion, Victor Hugo, Balzac. **French only** | free ([create an account](https://apicollections.parismusees.paris.fr/)) |
 
 ### Looking beyond Europe and the United States
 
@@ -93,6 +94,24 @@ This is a fallback for regions no museum API reaches, not a curated catalogue. M
 quality varies far more per item than a museum's own records, and a search resolves the
 keyword to an entity and then returns works *by* it — so it answers "Tarsila do Amaral"
 well and a subject phrase badly. Images come from Wikimedia Commons.
+
+### A note on Paris Musées
+
+One adapter covers the City of Paris's 14 museums, including the Petit Palais,
+Carnavalet, the Musée d'Art Moderne, Palais Galliera and the houses of Victor Hugo
+and Balzac. Create an account at
+[apicollections.parismusees.paris.fr](https://apicollections.parismusees.paris.fr/),
+then add a token under *Mon compte* > *Modifier* > *Auth Tokens*.
+
+- **French only.** Titles, labels and descriptions are in French, so query in French
+  (`soleil couchant`, not `sunset`). Results come back with `language: "fr"`.
+- **Rights are per image.** Every record has a thumbnail. Only images the museum
+  marks as free (CC0) get a full-size `imageUrl` and `license: "CC0"`; the rest are
+  thumbnail-only, and `get_artwork_image` returns the thumbnail.
+- **Full images are originals,** about 3MB for a painting. The public API offers no
+  medium size.
+- **1,000 requests a day** on the public API. Each search and each `get_artwork` is
+  one request; image downloads come from the public website and do not count.
 
 ### A note on Rijksmuseum
 

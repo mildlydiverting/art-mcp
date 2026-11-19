@@ -16,6 +16,7 @@ export const SOURCES = [
   "tepapa",
   "europeana",
   "europeana-archives",
+  "parismusees",
   "wikidata",
 ] as const;
 

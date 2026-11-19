@@ -32,6 +32,8 @@ const QUERIES: Record<Source, string> = {
   tepapa: "korowai",
   europeana: "Vermeer",
   "europeana-archives": "Dickens",
+  // French-language catalogue.
+  parismusees: "Monet",
   wikidata: "Tarsila do Amaral",
 };
 
