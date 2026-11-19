@@ -126,8 +126,10 @@ Branch `add-parismusees`, cut from `main`. `parismusees`, key
 - The index can return one artwork several times ("Lavacourt" gave 226737
   three times), so search fetches 3x the limit and de-duplicates.
 - Checked live 2026-11-19: search, detail, image (3MB, 6s). Query variables
-  work. Whether `conjunction: "AND"` narrows multi-word searches is not
-  confirmed: "soleil couchant" gave the same top 5 as the probe without it.
+  work. `conjunction: "AND"` narrows multi-word searches ("Carnavalet
+  enseigne": 149 results with it, 19,465 without).
+- The server sometimes returns a bare 500 for a valid request that succeeds
+  when repeated. open-museum-mcp retries once; this provider does not.
 
 ## Known source problems
 
