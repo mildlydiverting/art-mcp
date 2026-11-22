@@ -161,12 +161,53 @@ Branch `add-parismusees`, cut from `main`. `parismusees`, key
   `filter`, `aggs`, `size`, `from`), `/api/v2/get?pid=`, Bearer auth.
 - Harvard image fetches occasionally time out at 30s; search and detail are fine.
 
+## Saved test data (plan, agreed 2026-11-22)
+
+Goal: tests that run without the live APIs, so a change to our code can be
+checked offline and in CI. The nightly smoke test stays, to catch museums
+changing their APIs.
+
+Approach: record and replay at the `fetch` seam. Every provider fetches
+through `request()` in `src/lib/http.ts`, so providers need no changes.
+
+1. **Runner.** Vitest (as in open-museum-mcp): runs TypeScript directly.
+   Add `"test": "vitest run"`. Keep Node 18 support in mind when picking the
+   Vitest version, or decide to raise `engines`.
+2. **Record.** `src/scripts/record-fixtures.ts` (excluded from the package
+   like `smoke.ts`). Runs a list of cases (source, `search` query or
+   `getArtwork` ID) against the live APIs with keys from Keychain, and saves
+   each response to `test/fixtures/<source>/<case>.json`, with the request
+   URL alongside. Strip API keys from URLs and bodies before saving (some
+   responses carry the key in `next` links); fail if a known key value is
+   still present.
+3. **Replay.** A test helper stubs `globalThis.fetch` and returns the saved
+   body for each URL, matched with the key parameters removed. An unmatched
+   URL fails the test with the URL in the message: no silent network calls.
+4. **Assert.** Per provider, call `search` / `getArtwork` and check the
+   normalised result: title, artist, dates, museum link, image URL, licence.
+   Check exact strings for names with diacritics and CJK.
+5. **Cases.** Start from the record fixtures and names in the dev note
+   `art-mcp-notes/test-fixtures.md` (QIDs and ULAN IDs added 2026-11-22).
+   At least one search and one detail per provider. Include known edge cases:
+   Smithsonian `edanmdm:` prefix and unprefixed 404; Cooper Hewitt link;
+   Wikidata label edge cases (Dürer has no `@en` label, Portinari's English
+   label drops the circumflex, Mu Xin is labelled "Muxin").
+6. **Images.** `get_artwork_image` fetches binary data. Replay those with a
+   tiny placeholder image, or leave them to the smoke test. Decide when
+   building.
+7. **Re-recording.** Fixtures are a snapshot. Re-record a provider only when
+   its test fails because the museum changed, and review the diff.
+
+Order: runner and replay helper with one provider (SMK, no key needed), then
+the rest one commit per provider. Build on its own branch from `main`.
+
 ## Next
 
 1. PR the providers upstream if wanted (upstream has not acted on PRs #2-#4;
    the Art Institute fix is its own PR from `fix/artic-user-agent`).
 2. Museum Data Service, once there is a working Search API token.
 3. Decide the facets plan (shape, date policy, when to start).
+4. Build the saved test data (see "Saved test data" above).
 
 ## Running locally
 
