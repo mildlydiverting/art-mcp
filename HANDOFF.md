@@ -117,7 +117,11 @@ Branch `add-parismusees`, cut from `main`. `parismusees`, key
   `type_contenu_chaine_s = oeuvre`; detail is `nodeById` with the `fieldCartel*`
   label strings. One request each: the public quota is 1,000 a day.
 - Rights per image: `fieldImageLibre` true (`fieldImageDroits` "CC0 Paris
-  Musées / …") or null. Only free images get `imageUrl` and a licence.
+  Musées / …"), false or null. Only free images get `imageUrl` and a licence.
+  `license` is the museum's statement verbatim, never shortened to "CC0" (a
+  qualified statement must not read as plain CC0). A live survey of 4,237 free
+  images found every statement starting `CC0`, with 34 spellings; the stricter
+  open-museum-mcp gate matches them exactly (PR #215).
 - `fieldMediaImage` is null on the public API, so no derivatives: `imageUrl`
   is the ~3MB original from the public website.
 - Boolean conditions in `searchAPISearch` ignore `false`; filter in code.

@@ -10,8 +10,8 @@ import type { Artwork, ArtworkDetail, Provider } from "../types.js";
 // lookup is exactly one request. Images are not: they come from the public
 // website, outside the quota.
 //
-// Rights are per image. `fieldImageLibre` is true for CC0 images and null
-// otherwise. Every record has a thumbnail; only CC0 records get a full image.
+// Rights are per image. `fieldImageLibre` is true for CC0 images and null or
+// false otherwise. Every record has a thumbnail; only CC0 records get a full image.
 // Records, titles and labels are in French only.
 const ENDPOINT = "https://apicollections.parismusees.paris.fr/graphql";
 const SITE = "https://www.parismuseescollections.paris.fr";
@@ -264,7 +264,10 @@ function toDetail(o: Oeuvre, id: string): ArtworkDetail {
     department: clean(museum?.fieldMuseeTitreCourt) ?? clean(museum?.name),
     creditLine: clean(o.fieldCartelModeAcquisition),
     isPublicDomain: Boolean(free),
-    license: free ? (rights?.startsWith("CC0") ? "CC0" : rights ?? "CC0") : undefined,
+    // The museum's own statement, verbatim ("CC0 Paris Musées / …"). It is not
+    // shortened to "CC0": a qualified statement must not read as plain CC0, and
+    // a missing one must not be filled in.
+    license: free ? (rights ?? "Marked free by the museum; no rights statement given") : undefined,
     description:
       stripHtml(o.fieldOeuvreDescriptionIcono?.value) ??
       stripHtml(o.fieldDescription?.value),
